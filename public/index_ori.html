@@ -1,0 +1,135 @@
+<html>
+    <!--get post-->
+    <head>
+        <title>Balcomitsx</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script>
+            $(document).ready(function(){
+               $("#formJadwal").submit(function(e){
+                  e.preventDefault();
+                  postData();
+               });
+               getData();
+            });
+
+            function getData(){
+                $.ajax({
+                  data: {},
+                  url: "http://localhost:8081/ambil-data", 
+                  type:"get", 
+                  dataType: "json",
+                  success: function(result){
+                     data = result;
+                     showData();
+                  }
+               });
+            }
+            function postData(){
+                //alert("ok");
+                //return false;
+               //var params = {nrp: $("#nrp").val(), nama: $("#nama").val()};
+               var params = {crud: $("#crud").val(), id: $("#id").val(), 
+                  tim_regu: $("#tim_regu").val(), jadwal: $("#jadwal").val(), jam: $("#jam").val(), status: $("#status").val()};
+               $.ajax({
+                  data: params,
+                  url: "http://localhost:8081/simpan-data", 
+                  type:"post", 
+                  dataType: "json",
+                  success: function(result){
+                     if(result.status == 1){
+                        getData();
+                        reset();
+                     }
+                     console.log(result);
+                  },
+                  error: function(result){
+                     console.log(result);
+                     alert("Error: "+JSON.stringify(result));
+                  }
+               });
+            }
+
+
+            var data = [];
+           function showData(){
+               var items = ""; 
+               $.each(data, function(index, array){
+                var tim = '';
+                if(array.tim_regu == 1)tim = 'F-SCIENTICS VS F-CIVPLAN';
+                else if(array.tim_regu == 2)tim = 'F-MARTECH VS F-CREABIZ';
+                else if(array.tim_regu == 3)tim = 'F-INDSYS VS F-VOCATIONS';
+                else if(array.tim_regu == 4)tim = 'F-ELECTICS VS S-IMT';
+                  items += '<tr>';
+                  items += '<td>' + (index+1) +'</td>';
+                  items += '<td>' + tim +'</td>';
+                  items += '<td>' + (array.jadwal) +'</td>';
+                  items += '<td>' + (array.jam) +'</td>';
+                  items += '<td>' + (array.status == 1 ? "Sudah" : "Belum") +'</td>';
+                  items += '<td><button onclick="editData('+ index + ')">Edit</button></td>';
+                  items += '</tr>';
+               });
+
+               $("#tabel tbody").html(items);
+            }
+
+            function editData(index){
+                //alert("Edit: " + index);
+                var array = data[index];
+
+                $("#crud").val("edit");
+                $("#id").val(array.no);
+                $("#tim_regu").val(array.tim_regu);
+                $("#jadwal").val(array.jadwal);
+                $("#jam").val(array.jam);
+                $("#status").val(array.status);
+            }
+
+            function reset(){
+               $("#crud").val("add");
+               $("#id").val("");
+               $("#jam").val("");
+            }
+        </script>
+</head>
+    <!--body-->
+    <body>
+        <h1>jadwal pertandingan</h1>
+       <form id="formJadwal" action="/">
+            <input type="hidden" id="crud" name="crud" value="add" />
+            <input type="hidden" id="id" name="id" value="" />
+            <label for="jadwalpertandingan">Tim Regu :</label>
+            <select name="tim_regu" id="tim_regu">
+              <option value="1">F-SCIENTICS VS F-CIVPLAN</option>
+              <option value="2">F-MARTECH VS F-CREABIZ</option>
+              <option value="3">F-INDSYS VS F-VOCATIONS</option>
+              <option value="4">F-ELECTICS VS S-IMT</option>
+            </select>
+<br><br> 
+            <label for="jadwal">Jadwal:</label>
+            <input type="date" id="jadwal" name="jadwal"><br><br>  
+            <label for="jam">Jam:</label>
+            <input type="text" id="jam" name="jam"><br /><br />
+            <label for="status">Status:</label>
+            <select name="status" id="status">
+               <option value="1">Sudah Bermain</option>
+               <option value="0">Belum Bermain</option>
+             </select>
+            <br><br> 
+            <button >Simpan</button>&nbsp;&nbsp;
+            <a href="javascript:void(0)" onclick="reset()" >Reset</a>
+          </form><br><br> 
+           
+    
+          <table id="tabel" border="1"><br><br>
+             <thead>
+                <th>No</th>
+                <th>Tim Regu</th>
+                <th>Jadwal</th>
+                <th>Jam</th>
+                <th>Bermain</th>
+                <th>Action</th>
+             </thead>
+             <tbody></tbody>
+          </table>  
+    </body>
+</html>

@@ -1,0 +1,83 @@
+<html>
+    <head>
+        <title>Okik</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script>
+            $(document).ready(function(){
+               getData();
+            });
+
+            function getData(){
+                $.ajax({
+                  data: {},
+                  url: "http://localhost:8081/ambil-data", 
+                  type:"get", 
+                  dataType: "json",
+                  success: function(result){
+                     showData(result);
+                  }
+               });
+            }
+            function postData(){
+               var params = {nrp: $("#nrp").val(), nama: $("#nama").val()};
+               $.ajax({
+                  data: params,
+                  url: "http://localhost:8081/simpan-data", 
+                  type:"post", 
+                  dataType: "json",
+                  success: function(result){
+                     if(result.status == 1){
+                        getData();
+                     }
+                     console.log(result);
+                  },
+                  error: function(result){
+                     console.log(result);
+                     alert("Error: "+JSON.stringify(result));
+                  }
+               });
+            }
+
+            function showData(data){
+               var items = ""; 
+               $.each(data, function(index, array){
+                  items += '<tr>';
+                  items += '<td>' + (index+1) +'</td>';
+                  items += '<td>' + (array.nrp) +'</td>';
+                  items += '<td>' + (array.nama) +'</td>';
+                  items += '</tr>';
+               });
+
+               $("#tabel tbody").html(items);
+            }
+        </script>
+    </head>
+    
+    <body>
+         <table>
+            <tr>
+      <td>NRP: </td>
+        <td><input type="text" id="nrp" /></td>
+      </tr>
+      <tr>
+        <td>Nama: </td>
+        <td><input type="text" id="nama" /></td>
+      </tr>
+        <tr>
+         <td><button onclick="postData()" >Simpan</button></td>
+        </tr>
+      </table>  
+      <br />
+      <br />
+
+      <table id="tabel" border="1">
+         <thead>
+            <th>No</th>
+            <th>NRP</th>
+            <th>Nama</th>
+         </thead>
+         <tbody></tbody>
+      </table>
+    </body>
+    
+</html>
